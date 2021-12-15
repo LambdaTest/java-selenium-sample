@@ -28,7 +28,7 @@ public class BasicAuthentication {
         ltOptions.put("user", System.getenv("LT_USERNAME"));
         ltOptions.put("accessKey", System.getenv("LT_ACCESS_KEY"));
         ltOptions.put("build", "Selenium 4");
-        ltOptions.put("name", "Bidi-Basic-Authentication");
+        ltOptions.put("name", this.getClass().getName());
         ltOptions.put("platformName", "Windows 10");
         ltOptions.put("seCdp", true);
         ltOptions.put("selenium_version", "4.0.0");
@@ -67,7 +67,6 @@ public class BasicAuthentication {
     public void tearDown() {
         try {
             driver.quit();
-
         } catch (
 
         Exception e) {
