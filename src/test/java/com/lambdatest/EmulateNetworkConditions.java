@@ -1,26 +1,29 @@
 package com.lambdatest;
 
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Optional;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.HasAuthentication;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.UsernameAndPassword;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.HasDevTools;
+import org.openqa.selenium.devtools.v96.network.Network;
 import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-public class BasicAuthentication {
+
+public class EmulateNetworkConditions {
     public static String hubURL = "https://hub.lambdatest.com/wd/hub";
+
     private WebDriver driver;
 
+    
     public void setup() throws MalformedURLException {
-
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability("browserName", "Chrome");
         capabilities.setCapability("browserVersion", "latest");
@@ -28,42 +31,40 @@ public class BasicAuthentication {
         ltOptions.put("user", System.getenv("LT_USERNAME"));
         ltOptions.put("accessKey", System.getenv("LT_ACCESS_KEY"));
         ltOptions.put("build", "Selenium 4");
-        ltOptions.put("name", "Bidi-Basic-Authentication");
+        ltOptions.put("name",this.getClass().getName());
         ltOptions.put("platformName", "Windows 10");
         ltOptions.put("seCdp", true);
         ltOptions.put("selenium_version", "4.0.0");
         capabilities.setCapability("LT:Options", ltOptions);
 
         driver = new RemoteWebDriver(new URL(hubURL), capabilities);
+
         System.out.println(driver);
     }
 
-    public void authentication() {
+    
+    public void emulateNetworkConditions() throws InterruptedException {
         Augmenter augmenter = new Augmenter();
         driver = augmenter.augment(driver);
-
         DevTools devTools = ((HasDevTools) driver).getDevTools();
         devTools.createSession();
 
-        driver = augmenter.addDriverAugmentation("chrome", HasAuthentication.class,
-                (caps, exec) -> (whenThisMatches, useTheseCredentials) -> devTools.getDomains().network()
-                        .addAuthHandler(whenThisMatches, useTheseCredentials))
-                .augment(driver);
-
-        ((HasAuthentication) driver).register(UsernameAndPassword.of("foo", "bar"));
-
-        driver.get("http://httpbin.org/basic-auth/foo/bar");
-
-        String text = driver.findElement(By.tagName("body")).getText();
-        System.out.println(text);
-        if (text.contains("authenticated")) {
-            markStatus("passed", "Authentication Successful", driver);
+        devTools.send(Network.emulateNetworkConditions(false, 0, 2 * 1024 * 1024, 2 * 1024 * 1024, Optional.empty()));
+        driver.get("https://fast.com");
+        Thread.sleep(15000);
+        String speed = driver.findElement(By.id("speed-value")).getText();
+        String units = driver.findElement(By.id("speed-units")).getText();
+        System.out.println(speed);
+        System.out.println(units);
+        if (Float.parseFloat(speed) < 2 && units.equals("Mbps")) {
+            markStatus("passed", "Speed is in the limit of 2 Mbps", driver);
         } else {
-            markStatus("failed", "Authentication Failure", driver);
+            markStatus("failed", "Speed is not in the limit of 2 Mbp", driver);
         }
 
     }
 
+    
     public void tearDown() {
         try {
             driver.quit();
@@ -84,9 +85,9 @@ public class BasicAuthentication {
     }
 
     public static void main(String[] args) throws MalformedURLException, InterruptedException {
-        BasicAuthentication test = new BasicAuthentication();
+        EmulateNetworkConditions test= new EmulateNetworkConditions();
         test.setup();
-        test.authentication();
+        test.emulateNetworkConditions();
         test.tearDown();
     }
 }

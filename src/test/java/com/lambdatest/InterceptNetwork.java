@@ -1,26 +1,32 @@
 package com.lambdatest;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.function.Supplier;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.HasAuthentication;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.UsernameAndPassword;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.HasDevTools;
+import org.openqa.selenium.devtools.NetworkInterceptor;
 import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.http.HttpResponse;
+import org.openqa.selenium.remote.http.Route;
 
-public class BasicAuthentication {
+
+public class InterceptNetwork {
     public static String hubURL = "https://hub.lambdatest.com/wd/hub";
+
     private WebDriver driver;
-
+    
     public void setup() throws MalformedURLException {
-
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability("browserName", "Chrome");
         capabilities.setCapability("browserVersion", "latest");
@@ -28,7 +34,7 @@ public class BasicAuthentication {
         ltOptions.put("user", System.getenv("LT_USERNAME"));
         ltOptions.put("accessKey", System.getenv("LT_ACCESS_KEY"));
         ltOptions.put("build", "Selenium 4");
-        ltOptions.put("name", "Bidi-Basic-Authentication");
+        ltOptions.put("name",this.getClass().getName());
         ltOptions.put("platformName", "Windows 10");
         ltOptions.put("seCdp", true);
         ltOptions.put("selenium_version", "4.0.0");
@@ -38,32 +44,37 @@ public class BasicAuthentication {
         System.out.println(driver);
     }
 
-    public void authentication() {
+    
+    public void interceptNetwork() {
         Augmenter augmenter = new Augmenter();
         driver = augmenter.augment(driver);
 
         DevTools devTools = ((HasDevTools) driver).getDevTools();
         devTools.createSession();
 
-        driver = augmenter.addDriverAugmentation("chrome", HasAuthentication.class,
-                (caps, exec) -> (whenThisMatches, useTheseCredentials) -> devTools.getDomains().network()
-                        .addAuthHandler(whenThisMatches, useTheseCredentials))
-                .augment(driver);
+        Supplier<InputStream> message = () -> new ByteArrayInputStream(
+                "Creamy, delicious cheese!".getBytes(StandardCharsets.UTF_8));
 
-        ((HasAuthentication) driver).register(UsernameAndPassword.of("foo", "bar"));
+        NetworkInterceptor interceptor = new NetworkInterceptor(
+                driver,
+                Route.matching(req -> true)
+                        .to(() -> req -> new HttpResponse()
+                                .setStatus(200)
+                                .addHeader("Content-Type", StandardCharsets.UTF_8.toString())
+                                .setContent(message)));
+        driver.get("https://example-sausages-site.com");
+        String source = driver.getPageSource();
+        System.out.println(source);
 
-        driver.get("http://httpbin.org/basic-auth/foo/bar");
-
-        String text = driver.findElement(By.tagName("body")).getText();
-        System.out.println(text);
-        if (text.contains("authenticated")) {
-            markStatus("passed", "Authentication Successful", driver);
+        if (source.contains("delicious cheese!")) {
+            markStatus("passed", "Source contains the contents", driver);
         } else {
-            markStatus("failed", "Authentication Failure", driver);
+            markStatus("failed", "Content was not found in the source", driver);
         }
+        interceptor.close();
 
     }
-
+    
     public void tearDown() {
         try {
             driver.quit();
@@ -84,9 +95,9 @@ public class BasicAuthentication {
     }
 
     public static void main(String[] args) throws MalformedURLException, InterruptedException {
-        BasicAuthentication test = new BasicAuthentication();
+        InterceptNetwork test = new InterceptNetwork();
         test.setup();
-        test.authentication();
+        test.interceptNetwork();
         test.tearDown();
     }
 }

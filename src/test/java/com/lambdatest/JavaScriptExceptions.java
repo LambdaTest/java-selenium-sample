@@ -1,26 +1,33 @@
 package com.lambdatest;
 
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
 import org.openqa.selenium.By;
-import org.openqa.selenium.HasAuthentication;
+import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.UsernameAndPassword;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.HasDevTools;
 import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-public class BasicAuthentication {
+
+public class JavaScriptExceptions {
     public static String hubURL = "https://hub.lambdatest.com/wd/hub";
+    static Boolean success = false;
+
     private WebDriver driver;
-
+    
     public void setup() throws MalformedURLException {
-
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability("browserName", "Chrome");
         capabilities.setCapability("browserVersion", "latest");
@@ -28,7 +35,7 @@ public class BasicAuthentication {
         ltOptions.put("user", System.getenv("LT_USERNAME"));
         ltOptions.put("accessKey", System.getenv("LT_ACCESS_KEY"));
         ltOptions.put("build", "Selenium 4");
-        ltOptions.put("name", "Bidi-Basic-Authentication");
+        ltOptions.put("name",this.getClass().getName());
         ltOptions.put("platformName", "Windows 10");
         ltOptions.put("seCdp", true);
         ltOptions.put("selenium_version", "4.0.0");
@@ -38,32 +45,41 @@ public class BasicAuthentication {
         System.out.println(driver);
     }
 
-    public void authentication() {
+    
+    public void javaScriptExceptions() throws InterruptedException {
         Augmenter augmenter = new Augmenter();
         driver = augmenter.augment(driver);
 
         DevTools devTools = ((HasDevTools) driver).getDevTools();
         devTools.createSession();
 
-        driver = augmenter.addDriverAugmentation("chrome", HasAuthentication.class,
-                (caps, exec) -> (whenThisMatches, useTheseCredentials) -> devTools.getDomains().network()
-                        .addAuthHandler(whenThisMatches, useTheseCredentials))
-                .augment(driver);
+        List<JavascriptException> jsExceptionsList = new ArrayList<>();
+        Consumer<JavascriptException> addEntry = jsExceptionsList::add;
+        devTools.getDomains().events().addJavascriptExceptionListener(addEntry);
 
-        ((HasAuthentication) driver).register(UsernameAndPassword.of("foo", "bar"));
+        driver.get("https://facebook.com");
 
-        driver.get("http://httpbin.org/basic-auth/foo/bar");
+        WebElement link2click = driver.findElement(By.name("login"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].setAttribute(arguments[1], arguments[2]);",
+                link2click, "onclick", "throw new Error('My JS Error');");
+        link2click.click();
 
-        String text = driver.findElement(By.tagName("body")).getText();
-        System.out.println(text);
-        if (text.contains("authenticated")) {
-            markStatus("passed", "Authentication Successful", driver);
+        Thread.sleep(1000);
+        for (JavascriptException jsException : jsExceptionsList) {
+            System.out.println("My JS exception message: " + jsException.getMessage());
+            System.out.println("My JS exception system: " + jsException.getSystemInformation());
+            jsException.printStackTrace();
+            success = true;
+        }
+        Thread.sleep(1000);
+        if (success) {
+            markStatus("passed", "Got JS exception", driver);
         } else {
-            markStatus("failed", "Authentication Failure", driver);
+            markStatus("failed", "Didn't got JS exception", driver);
         }
 
     }
-
+    
     public void tearDown() {
         try {
             driver.quit();
@@ -84,9 +100,9 @@ public class BasicAuthentication {
     }
 
     public static void main(String[] args) throws MalformedURLException, InterruptedException {
-        BasicAuthentication test = new BasicAuthentication();
+        JavaScriptExceptions test = new JavaScriptExceptions();
         test.setup();
-        test.authentication();
+        test.javaScriptExceptions();
         test.tearDown();
     }
 }

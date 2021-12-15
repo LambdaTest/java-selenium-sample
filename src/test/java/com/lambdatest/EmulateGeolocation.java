@@ -3,24 +3,26 @@ package com.lambdatest;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.HasAuthentication;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.UsernameAndPassword;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.HasDevTools;
+import org.openqa.selenium.devtools.v96.emulation.Emulation;
 import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-public class BasicAuthentication {
+public class EmulateGeolocation {
+
     public static String hubURL = "https://hub.lambdatest.com/wd/hub";
     private WebDriver driver;
 
     public void setup() throws MalformedURLException {
-
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability("browserName", "Chrome");
         capabilities.setCapability("browserVersion", "latest");
@@ -28,38 +30,47 @@ public class BasicAuthentication {
         ltOptions.put("user", System.getenv("LT_USERNAME"));
         ltOptions.put("accessKey", System.getenv("LT_ACCESS_KEY"));
         ltOptions.put("build", "Selenium 4");
-        ltOptions.put("name", "Bidi-Basic-Authentication");
+        ltOptions.put("name", this.getClass().getName());
         ltOptions.put("platformName", "Windows 10");
         ltOptions.put("seCdp", true);
         ltOptions.put("selenium_version", "4.0.0");
         capabilities.setCapability("LT:Options", ltOptions);
 
+        ChromeOptions options = new ChromeOptions();
+
+        Map<String, Object> prefs = new HashMap<String, Object>();
+        prefs.put("googlegeolocationaccess.enabled", true);
+        prefs.put("profile.default_content_setting_values.geolocation", 1); // 1:allow 2:block
+        prefs.put("profile.default_content_setting_values.notifications", 1);
+        prefs.put("profile.managed_default_content_settings", 1);
+        options.setExperimentalOption("prefs", prefs);
+        capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+
         driver = new RemoteWebDriver(new URL(hubURL), capabilities);
+
         System.out.println(driver);
     }
 
-    public void authentication() {
+    public void emulateGeolocation() {
         Augmenter augmenter = new Augmenter();
         driver = augmenter.augment(driver);
 
         DevTools devTools = ((HasDevTools) driver).getDevTools();
         devTools.createSession();
 
-        driver = augmenter.addDriverAugmentation("chrome", HasAuthentication.class,
-                (caps, exec) -> (whenThisMatches, useTheseCredentials) -> devTools.getDomains().network()
-                        .addAuthHandler(whenThisMatches, useTheseCredentials))
-                .augment(driver);
+        // setGeolocationOverride() takes input lattitude, longitude and accuracy as
+        // parameters.
+        devTools.send(Emulation.setGeolocationOverride(Optional.of(28.622409),
+                Optional.of(77.364925),
+                Optional.of(1)));
+        driver.get("https://my-location.org");
 
-        ((HasAuthentication) driver).register(UsernameAndPassword.of("foo", "bar"));
-
-        driver.get("http://httpbin.org/basic-auth/foo/bar");
-
-        String text = driver.findElement(By.tagName("body")).getText();
-        System.out.println(text);
-        if (text.contains("authenticated")) {
-            markStatus("passed", "Authentication Successful", driver);
+        String address = driver.findElement(By.id("address")).getText();
+        System.out.println(address);
+        if (address.contains("Noida")) {
+            markStatus("passed", "I am in Noida", driver);
         } else {
-            markStatus("failed", "Authentication Failure", driver);
+            markStatus("failed", "I am not in Noida", driver);
         }
 
     }
@@ -84,9 +95,9 @@ public class BasicAuthentication {
     }
 
     public static void main(String[] args) throws MalformedURLException, InterruptedException {
-        BasicAuthentication test = new BasicAuthentication();
+        EmulateGeolocation test = new EmulateGeolocation();
         test.setup();
-        test.authentication();
+        test.emulateGeolocation();
         test.tearDown();
     }
 }

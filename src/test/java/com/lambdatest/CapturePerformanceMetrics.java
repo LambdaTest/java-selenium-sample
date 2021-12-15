@@ -3,24 +3,26 @@ package com.lambdatest;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.HasAuthentication;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.UsernameAndPassword;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.HasDevTools;
+import org.openqa.selenium.devtools.v94.performance.Performance;
+import org.openqa.selenium.devtools.v94.performance.model.Metric;
 import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-public class BasicAuthentication {
+public class CapturePerformanceMetrics {
     public static String hubURL = "https://hub.lambdatest.com/wd/hub";
+
+    static Boolean success = false;
     private WebDriver driver;
 
     public void setup() throws MalformedURLException {
-
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability("browserName", "Chrome");
         capabilities.setCapability("browserVersion", "latest");
@@ -28,7 +30,7 @@ public class BasicAuthentication {
         ltOptions.put("user", System.getenv("LT_USERNAME"));
         ltOptions.put("accessKey", System.getenv("LT_ACCESS_KEY"));
         ltOptions.put("build", "Selenium 4");
-        ltOptions.put("name", "Bidi-Basic-Authentication");
+        ltOptions.put("name", this.getClass().getName());
         ltOptions.put("platformName", "Windows 10");
         ltOptions.put("seCdp", true);
         ltOptions.put("selenium_version", "4.0.0");
@@ -38,30 +40,27 @@ public class BasicAuthentication {
         System.out.println(driver);
     }
 
-    public void authentication() {
+    public void capturePerformanceMetrics() {
         Augmenter augmenter = new Augmenter();
         driver = augmenter.augment(driver);
 
         DevTools devTools = ((HasDevTools) driver).getDevTools();
         devTools.createSession();
 
-        driver = augmenter.addDriverAugmentation("chrome", HasAuthentication.class,
-                (caps, exec) -> (whenThisMatches, useTheseCredentials) -> devTools.getDomains().network()
-                        .addAuthHandler(whenThisMatches, useTheseCredentials))
-                .augment(driver);
+        devTools.send(Performance.enable(Optional.empty()));
+        List<Metric> metricList = devTools.send(Performance.getMetrics());
 
-        ((HasAuthentication) driver).register(UsernameAndPassword.of("foo", "bar"));
+        driver.get("https://lambdatest.com");
 
-        driver.get("http://httpbin.org/basic-auth/foo/bar");
-
-        String text = driver.findElement(By.tagName("body")).getText();
-        System.out.println(text);
-        if (text.contains("authenticated")) {
-            markStatus("passed", "Authentication Successful", driver);
-        } else {
-            markStatus("failed", "Authentication Failure", driver);
+        for (Metric m : metricList) {
+            System.out.println(m.getName() + " = " + m.getValue());
+            success = true;
         }
-
+        if (success) {
+            markStatus("passed", "Performance metrics successfully fetched", driver);
+        } else {
+            markStatus("failed", "Unable to fetch Performance metrics", driver);
+        }
     }
 
     public void tearDown() {
@@ -84,9 +83,9 @@ public class BasicAuthentication {
     }
 
     public static void main(String[] args) throws MalformedURLException, InterruptedException {
-        BasicAuthentication test = new BasicAuthentication();
+        CapturePerformanceMetrics test = new CapturePerformanceMetrics();
         test.setup();
-        test.authentication();
+        test.capturePerformanceMetrics();
         test.tearDown();
     }
 }

@@ -1,26 +1,30 @@
 package com.lambdatest;
 
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Optional;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.HasAuthentication;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.UsernameAndPassword;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.HasDevTools;
+import org.openqa.selenium.devtools.v94.emulation.Emulation;
 import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-public class BasicAuthentication {
+
+public class OverrideDeviceMode {
     public static String hubURL = "https://hub.lambdatest.com/wd/hub";
+
     private WebDriver driver;
+    
 
+    
     public void setup() throws MalformedURLException {
-
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability("browserName", "Chrome");
         capabilities.setCapability("browserVersion", "latest");
@@ -28,7 +32,7 @@ public class BasicAuthentication {
         ltOptions.put("user", System.getenv("LT_USERNAME"));
         ltOptions.put("accessKey", System.getenv("LT_ACCESS_KEY"));
         ltOptions.put("build", "Selenium 4");
-        ltOptions.put("name", "Bidi-Basic-Authentication");
+        ltOptions.put("name",this.getClass().getName());
         ltOptions.put("platformName", "Windows 10");
         ltOptions.put("seCdp", true);
         ltOptions.put("selenium_version", "4.0.0");
@@ -38,32 +42,29 @@ public class BasicAuthentication {
         System.out.println(driver);
     }
 
-    public void authentication() {
+    
+    public void overrideDevicemode() {
         Augmenter augmenter = new Augmenter();
         driver = augmenter.augment(driver);
 
         DevTools devTools = ((HasDevTools) driver).getDevTools();
         devTools.createSession();
 
-        driver = augmenter.addDriverAugmentation("chrome", HasAuthentication.class,
-                (caps, exec) -> (whenThisMatches, useTheseCredentials) -> devTools.getDomains().network()
-                        .addAuthHandler(whenThisMatches, useTheseCredentials))
-                .augment(driver);
+        devTools.send(Emulation.setDeviceMetricsOverride(414, 736, 50, true, Optional.empty(), Optional.empty(),
+                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+                Optional.empty(), Optional.empty()));
+        driver.get("http://whatismyscreenresolution.net/");
+        String resolution = driver.findElement(By.id("resolution")).getText();
 
-        ((HasAuthentication) driver).register(UsernameAndPassword.of("foo", "bar"));
-
-        driver.get("http://httpbin.org/basic-auth/foo/bar");
-
-        String text = driver.findElement(By.tagName("body")).getText();
-        System.out.println(text);
-        if (text.contains("authenticated")) {
-            markStatus("passed", "Authentication Successful", driver);
+        System.out.println(resolution);
+        if (resolution.equals("414x736")) {
+            markStatus("passed", "Found screen resolution: 414x736", driver);
         } else {
-            markStatus("failed", "Authentication Failure", driver);
+            markStatus("failed", "Not found screen resolution: 414x736", driver);
         }
-
     }
 
+    
     public void tearDown() {
         try {
             driver.quit();
@@ -84,9 +85,9 @@ public class BasicAuthentication {
     }
 
     public static void main(String[] args) throws MalformedURLException, InterruptedException {
-        BasicAuthentication test = new BasicAuthentication();
+        OverrideDeviceMode test = new OverrideDeviceMode();
         test.setup();
-        test.authentication();
+        test.overrideDevicemode();
         test.tearDown();
     }
 }
