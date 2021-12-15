@@ -81,6 +81,7 @@ public class BasicAuthentication {
         jse.executeScript("lambda-status=" + status);
         System.out.println(reason);
     }
+    
     public static void main(String[] args) throws MalformedURLException {
     BasicAuthentication basicAuthTest=new BasicAuthentication();
     basicAuthTest.setup();

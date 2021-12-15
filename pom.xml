@@ -2,14 +2,14 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>Java-TestNG-Selenium</groupId>
-	<artifactId>Java-TestNG-Selenium</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<groupId>java-selenium-sample</groupId>
+	<artifactId>java-selenium-sample</artifactId>
+	<version>0.0.1</version>
 	<build>
-		<sourceDirectory>Java-TestNG-Selenium/src</sourceDirectory>
+		<sourceDirectory>java-selenium-sample/src</sourceDirectory>
 		<resources>
 			<resource>
-				<directory>Java-TestNG-Selenium/src</directory>
+				<directory>java-selenium-sample/src</directory>
 				<excludes>
 					<exclude>**/*.java</exclude>
 				</excludes>
