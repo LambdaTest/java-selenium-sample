@@ -1,44 +1,47 @@
-# java-selenium-sample
+# Java-Selenium-Sample
+![Java](https://www.lambdatest.com/support/assets/images/og-images/Java-with-Selenium-1-1.jpg)
 
-### Environment Setup
-
-1. Global Dependencies
-    * Install [Maven](https://maven.apache.org/install.html)
-    * Or Install Maven with [Homebrew](http://brew.sh/) (Easier)
+### Prerequisites
+1. Install and set environment variable for java.
+    * Windows - https://www.oracle.com/java/technologies/downloads/
+    * Linux - ```  sudo apt-get install openjdk-8-jre  ```
+    * MacOS - Java should already be present on Mac OS X by default.
+2 Install and set environment varibale for Maven.
+    * Windows - https://maven.apache.org/install.html
+    * Linux/ MacOS -  [Homebrew](http://brew.sh/) (Easier)
     ```
-    $ install maven
+     install maven
     ```
-2. Project Dependencies
-    * Checkout the repository
-    * Check that packages are available
-    ```
-    $ cd java-selenium-sample
-    ```
-    * You may also want to run the command below to check for outdated dependencies. Please be sure to verify and review updates before editing your pom.xml file as they may not be compatible with your code.
-    ```
-    $ mvn versions:display-dependency-updates
-    ```
-
-**LambdaTest Authentication Credentials:** Make sure you have your LambdaTest credentials with you to run test automation scripts with Jest on LambdaTest Selenium Grid. You can obtain these credentials from the [LambdaTest Automation Dashboard](https://automation.lambdatest.com/) or through [LambdaTest Profile](https://accounts.lambdatest.com/detail/profile).
-
-Set LambdaTest Username and Access Key in environment variables.
-
-* For Linux/macOS:
+    
+### Run your First Test
+1. Clone the Java-Selenium-Sample repository. 
 ```
-    $ export LT_USERNAME="YOUR_USERNAME"
-    $ export LT_ACCESS_KEY="YOUR ACCESS KEY"
+git clone https://github.com/LambdaTest/java-selenium-sample.git
 ```
-* For Windows:
+2. Next get into Java-Selenium-Sample folder, and import Lamabdatest Credentials. You can get these from lambdatest automation dashboard.
+   <p align="center">
+   <b>For Linux/macOS:</b>:
+ 
 ```
-    $ set LT_USERNAME="YOUR_USERNAME"
-    $ set LT_ACCESS_KEY="YOUR ACCESS KEY"
+export LT_USERNAME="YOUR_USERNAME"
+export LT_ACCESS_KEY="YOUR ACCESS KEY"
 ```
-### Running Tests
+<p align="center">
+   <b>For Windows:</b>
 
 ```
-To execute test
-    $ mvn clean install exec:java -Dexec.mainClass="com.lambdatest.BasicAuthentication" -Dexec.classpathScope=test -e
+set LT_USERNAME="YOUR_USERNAME"
+set LT_ACCESS_KEY="YOUR ACCESS KEY"
 ```
+Step 3. You may also want to run the command below to check for outdated dependencies. Please be sure to verify and review updates before editing your pom.xml file as they may not be compatible with your code.
+```
+ mvn versions:display-dependency-updates
+```
+Step 4. Run single test.
+```
+mvn clean install exec:java -Dexec.mainClass="com.lambdatest.BasicAuthentication" -Dexec.classpathScope=test -e
+```
+
 ## About LambdaTest
 
 [LambdaTest](https://www.lambdatest.com/) is a cloud based selenium grid infrastructure that can help you run automated cross browser compatibility tests on 2000+ different browser and operating system environments. LambdaTest supports all programming languages and frameworks that are supported with Selenium, and have easy integrations with all popular CI/CD platforms. It's a perfect solution to bring your [selenium automation testing](https://www.lambdatest.com/selenium-automation) to cloud based infrastructure that not only helps you increase your test coverage over multiple desktop and mobile browsers, but also allows you to cut down your test execution time by running tests on parallel.
