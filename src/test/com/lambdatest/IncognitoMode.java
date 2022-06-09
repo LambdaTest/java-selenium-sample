@@ -8,12 +8,12 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-public class Headless {
+public class IncognitoMode {
 
     private RemoteWebDriver driver;
     private String Status = "failed";
 
- 
+   
     public void setup() throws MalformedURLException {
         String username = System.getenv("LT_USERNAME") == null ? "Your LT Username" : System.getenv("LT_USERNAME");
         String authkey = System.getenv("LT_ACCESS_KEY") == null ? "Your LT AccessKey" : System.getenv("LT_ACCESS_KEY");
@@ -24,35 +24,24 @@ public class Headless {
         caps.setCapability("platform", "Windows 10");
         caps.setCapability("browserName", "Chrome");
         caps.setCapability("version", "latest");
-        caps.setCapability("build", "Java Test");
-        caps.setCapability("name",this.getClass().getName());
+        caps.setCapability("build", "Extension Test");
+        caps.setCapability("name", this.getClass().getName());
         caps.setCapability("plugin", "git-java");
 
         String[] Tags = new String[] { "Feature", "Falcon", "Severe" };
         caps.setCapability("tags", Tags);
 
-        // Chrome flag for headless using chrome options
-        ChromeOptions options = new ChromeOptions();
-
-        options.addArguments("--no-sandbox");
-        options.addArguments("--headless"); // headless flag for chrome
-        options.addArguments("disable-gpu");
-
+      
+        ChromeOptions options = new ChromeOptions ();
+        // Setting chrome flag for incognito mode
+        options.addArguments("--incognito");
         caps.setCapability(ChromeOptions.CAPABILITY, options);
-
-        /*
-         * At lambdatest you can execute headless tests via `headless` capability on
-         * chrome, firefox and microsoft edge browser
-         */
-
-        // lambdatest Headless capability
-        // caps.setCapability("headless",true);
 
         driver = new RemoteWebDriver(new URL("https://" + username + ":" + authkey + hub), caps);
 
     }
 
-    public void headlessTest() throws InterruptedException {
+    public void incognitoTest() throws InterruptedException {
         String spanText;
         System.out.println("Loading Url");
 
@@ -118,9 +107,9 @@ public class Headless {
 
 
     public static void main(String[] args) throws MalformedURLException, InterruptedException {
-        Headless test = new Headless();
+        IncognitoMode test = new IncognitoMode();
         test.setup();
-        test.headlessTest();
+        test.incognitoTest();
         test.tearDown();
     }
 
