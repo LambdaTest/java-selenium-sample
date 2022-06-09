@@ -107,9 +107,9 @@ public class Extension {
 
 
     public static void main(String[] args) throws MalformedURLException, InterruptedException {
-        ElementByText test = new ElementByText();
+        Extension test = new Extension();
         test.setup();
-        test.elementByTextTest();
+        test.extensionTest();
         test.tearDown();
     }
 
