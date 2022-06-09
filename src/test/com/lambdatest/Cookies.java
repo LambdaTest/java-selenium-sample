@@ -2,16 +2,18 @@ package com.lambdatest;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-
+import java.util.Set;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Cookie;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-public class BrowserCache {
+public class Cookies {
 
     private RemoteWebDriver driver;
     private String Status = "failed";
+
 
     public void setup() throws MalformedURLException {
         String username = System.getenv("LT_USERNAME") == null ? "Your LT Username" : System.getenv("LT_USERNAME");
@@ -23,8 +25,8 @@ public class BrowserCache {
         caps.setCapability("platform", "Windows 10");
         caps.setCapability("browserName", "Chrome");
         caps.setCapability("version", "latest");
-        caps.setCapability("build", "Extension Test");
-        caps.setCapability("name",  this.getClass().getName());
+        caps.setCapability("build", "Cookies Test");
+        caps.setCapability("name", this.getClass().getName());
         caps.setCapability("plugin", "git-testng");
 
         String[] Tags = new String[] { "Feature", "Falcon", "Severe" };
@@ -34,11 +36,27 @@ public class BrowserCache {
 
     }
 
-    public void browserCacheTest() throws InterruptedException {
+    public void cookiesTest() throws InterruptedException {
+
         String spanText;
         System.out.println("Loading Url");
 
         driver.get("https://lambdatest.github.io/sample-todo-app/");
+
+        driver.manage().addCookie(new Cookie("cookieName", "lambdatest")); // Creates and adds the cookie
+
+        Set<Cookie> cookiesSet = driver.manage().getCookies(); // Returns the List of all Cookies
+
+        for (Cookie itemCookie : cookiesSet) {
+            System.out.println((itemCookie.getName() + ";" + itemCookie.getValue() + ";" + itemCookie.getDomain() + ";"
+                    + itemCookie.getPath() + ";" + itemCookie.getExpiry() + ";" + itemCookie.isSecure()));
+        }
+
+        driver.manage().getCookieNamed("cookieName"); // Returns the specific cookie according to name
+
+        driver.manage().deleteCookie(driver.manage().getCookieNamed("cookieName")); // Deletes the specific cookie
+        driver.manage().deleteCookieNamed("cookieName"); // Deletes the specific cookie according to the Name
+        driver.manage().deleteAllCookies(); // Deletes all the cookies
 
         System.out.println("Checking Box");
         driver.findElement(By.name("li1")).click();
@@ -89,10 +107,6 @@ public class BrowserCache {
         Status = "passed";
         Thread.sleep(150);
 
-        // Clearing browser Cache after Test
-        driver.manage().deleteAllCookies(); // delete all cookies
-        Thread.sleep(7000); // wait 7 seconds to clear cookies.
-
         System.out.println("TestFinished");
 
     }
@@ -102,11 +116,10 @@ public class BrowserCache {
         driver.quit();
     }
 
-
     public static void main(String[] args) throws MalformedURLException, InterruptedException {
-        BrowserCache test =  new BrowserCache();
+        Cookies test = new Cookies();
         test.setup();
-        test.browserCacheTest();
+        test.cookiesTest();
         test.tearDown();
     }
 
