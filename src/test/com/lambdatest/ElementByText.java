@@ -27,7 +27,7 @@ public class ElementByText {
         caps.setCapability("browserName", "Chrome");
         caps.setCapability("version", "latest");
         caps.setCapability("build", "Extension Test");
-        caps.setCapability("name", m.getName() + " - " + this.getClass().getName());
+        caps.setCapability("name", this.getClass().getName());
         caps.setCapability("plugin", "git-testng");
 
         String[] Tags = new String[] { "Feature", "Falcon", "Severe" };
