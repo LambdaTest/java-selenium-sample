@@ -39,7 +39,7 @@ Step 3. You may also want to run the command below to check for outdated depende
 ```
 Step 4. Run single test.
 ```
-mvn clean install exec:java -Dexec.mainClass="com.lambdatest.Extension" -Dexec.classpathScope=test -e
+mvn clean install exec:java -Dexec.mainClass="com.lambdatest.GeoLocation" -Dexec.classpathScope=test -e
 ```
 
 ## About LambdaTest
