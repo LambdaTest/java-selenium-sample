@@ -13,7 +13,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-public class TestNGRelativeLocator {
+public class RelativeLocator {
 
     private WebDriver driver;
 
@@ -42,7 +42,7 @@ public class TestNGRelativeLocator {
         System.out.println(driver);
     }
 
-    public void testNGRelativeLocator() throws InterruptedException {
+    public void relativeLocator() throws InterruptedException {
 
         driver.get("http://cookbook.seleniumacademy.com/mobilebmicalculator.html");
 
