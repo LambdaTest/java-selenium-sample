@@ -98,9 +98,9 @@ public class RelativeLocator {
     }
 
     public static void main(String[] args) throws MalformedURLException, InterruptedException {
-        TestNGRelativeLocator test = new TestNGRelativeLocator();
+        RelativeLocator test = new RelativeLocator();
         test.setup();
-        test.testNGRelativeLocator();
+        test.relativeLocator();
         test.tearDown();
     }
 
