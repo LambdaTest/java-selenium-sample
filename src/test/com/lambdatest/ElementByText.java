@@ -6,15 +6,16 @@ import java.util.Set;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-public class Cookies {
+public class ElementByText {
 
     private RemoteWebDriver driver;
     private String Status = "failed";
 
-
+   
     public void setup() throws MalformedURLException {
         String username = System.getenv("LT_USERNAME") == null ? "Your LT Username" : System.getenv("LT_USERNAME");
         String authkey = System.getenv("LT_ACCESS_KEY") == null ? "Your LT AccessKey" : System.getenv("LT_ACCESS_KEY");
@@ -25,8 +26,8 @@ public class Cookies {
         caps.setCapability("platform", "Windows 10");
         caps.setCapability("browserName", "Chrome");
         caps.setCapability("version", "latest");
-        caps.setCapability("build", "Cookies Test");
-        caps.setCapability("name", this.getClass().getName());
+        caps.setCapability("build", "Extension Test");
+        caps.setCapability("name", m.getName() + " - " + this.getClass().getName());
         caps.setCapability("plugin", "git-testng");
 
         String[] Tags = new String[] { "Feature", "Falcon", "Severe" };
@@ -36,27 +37,30 @@ public class Cookies {
 
     }
 
-    public void cookiesTest() throws InterruptedException {
-
+   
+    public void elementByTextTest() throws InterruptedException {
         String spanText;
         System.out.println("Loading Url");
 
         driver.get("https://lambdatest.github.io/sample-todo-app/");
+        /*
+         * text(): A built-in method in Selenium WebDriver that is used with XPath
+         * locator to locate an element based on its exact text value.
+         * Example: //*[ text() = ‘5 of 5 remaining’ ]
+         * contains(): Similar to the text() method, contains() is another built-in
+         * method used to locate an element based on partial text match.
+         * For example, if we need to locate a label that has “5 of 5 remaining” as its
+         * text, it can be located using the following line of code with Xpath.
+         * Example: //*[ contains (text(), ‘5 of 5’ ) ]
+         */
 
-        driver.manage().addCookie(new Cookie("cookieName", "lambdatest")); // Creates and adds the cookie
+        // Locating element with text()
+        WebElement e = driver.findElement(By.xpath("//*[text()='5 of 5 remaining']"));
+        System.out.println(e.getText());
 
-        Set<Cookie> cookiesSet = driver.manage().getCookies(); // Returns the List of all Cookies
-
-        for (Cookie itemCookie : cookiesSet) {
-            System.out.println((itemCookie.getName() + ";" + itemCookie.getValue() + ";" + itemCookie.getDomain() + ";"
-                    + itemCookie.getPath() + ";" + itemCookie.getExpiry() + ";" + itemCookie.isSecure()));
-        }
-
-        driver.manage().getCookieNamed("cookieName"); // Returns the specific cookie according to name
-
-        driver.manage().deleteCookie(driver.manage().getCookieNamed("cookieName")); // Deletes the specific cookie
-        driver.manage().deleteCookieNamed("cookieName"); // Deletes the specific cookie according to the Name
-        driver.manage().deleteAllCookies(); // Deletes all the cookies
+        // located element with contains()
+        WebElement m = driver.findElement(By.xpath("//*[contains(text(),'5 of 5')]"));
+        System.out.println(m.getText());
 
         System.out.println("Checking Box");
         driver.findElement(By.name("li1")).click();
@@ -117,9 +121,9 @@ public class Cookies {
     }
 
     public static void main(String[] args) throws MalformedURLException, InterruptedException {
-        Cookies test = new Cookies();
+        ElementByText test = new ElementByText();
         test.setup();
-        test.cookiesTest();
+        test.elementByTextTest();
         test.tearDown();
     }
 
