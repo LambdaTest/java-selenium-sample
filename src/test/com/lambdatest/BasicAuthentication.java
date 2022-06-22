@@ -23,7 +23,7 @@ public class BasicAuthentication {
 
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability("browserName", "Chrome");
-        capabilities.setCapability("browserVersion", "latest");
+        capabilities.setCapability("browserVersion", "95");
         HashMap<String, Object> ltOptions = new HashMap<String, Object>();
         ltOptions.put("user", System.getenv("LT_USERNAME"));
         ltOptions.put("accessKey", System.getenv("LT_ACCESS_KEY"));

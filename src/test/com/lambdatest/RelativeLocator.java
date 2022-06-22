@@ -13,7 +13,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-public class TestNGRelativeLocator {
+public class RelativeLocator {
 
     private WebDriver driver;
 
@@ -98,7 +98,7 @@ public class TestNGRelativeLocator {
     }
 
     public static void main(String[] args) throws MalformedURLException, InterruptedException {
-        TestNGRelativeLocator test = new TestNGRelativeLocator();
+        RelativeLocator test = new RelativeLocator();
         test.setup();
         test.testNGRelativeLocator();
         test.tearDown();
