@@ -1,17 +1,18 @@
 package com.lambdatest;
 
 
+import static java.util.Optional.empty;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Optional;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.HasDevTools;
-import org.openqa.selenium.devtools.v94.emulation.Emulation;
+import org.openqa.selenium.devtools.v127.emulation.Emulation;
 import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -21,9 +22,9 @@ public class OverrideDeviceMode {
     public static String hubURL = "https://hub.lambdatest.com/wd/hub";
 
     private WebDriver driver;
-    
 
-    
+
+
     public void setup() throws MalformedURLException {
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability("browserName", "Chrome");
@@ -42,7 +43,7 @@ public class OverrideDeviceMode {
         System.out.println(driver);
     }
 
-    
+
     public void overrideDevicemode() {
         Augmenter augmenter = new Augmenter();
         driver = augmenter.augment(driver);
@@ -50,9 +51,9 @@ public class OverrideDeviceMode {
         DevTools devTools = ((HasDevTools) driver).getDevTools();
         devTools.createSession();
 
-        devTools.send(Emulation.setDeviceMetricsOverride(414, 736, 50, true, Optional.empty(), Optional.empty(),
-                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
-                Optional.empty(), Optional.empty()));
+        devTools.send(Emulation.setDeviceMetricsOverride(414, 736, 50, true, empty(), empty(),
+                empty(), empty(), empty(), empty(), empty(),
+                empty(), empty(), empty()));
         driver.get("http://whatismyscreenresolution.net/");
         String resolution = driver.findElement(By.id("resolution")).getText();
 
@@ -64,7 +65,7 @@ public class OverrideDeviceMode {
         }
     }
 
-    
+
     public void tearDown() {
         try {
             driver.quit();
@@ -84,7 +85,7 @@ public class OverrideDeviceMode {
         System.out.println(reason);
     }
 
-    public static void main(String[] args) throws MalformedURLException, InterruptedException {
+    public static void main(String[] args) throws MalformedURLException {
         OverrideDeviceMode test = new OverrideDeviceMode();
         test.setup();
         test.overrideDevicemode();

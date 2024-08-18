@@ -1,6 +1,8 @@
 package com.lambdatest;
 
 
+import static java.util.Optional.empty;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -11,7 +13,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.HasDevTools;
-import org.openqa.selenium.devtools.v96.network.Network;
+import org.openqa.selenium.devtools.v127.network.Network;
 import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -22,7 +24,7 @@ public class EmulateNetworkConditions {
 
     private WebDriver driver;
 
-    
+
     public void setup() throws MalformedURLException {
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability("browserName", "Chrome");
@@ -42,14 +44,14 @@ public class EmulateNetworkConditions {
         System.out.println(driver);
     }
 
-    
+
     public void emulateNetworkConditions() throws InterruptedException {
         Augmenter augmenter = new Augmenter();
         driver = augmenter.augment(driver);
         DevTools devTools = ((HasDevTools) driver).getDevTools();
         devTools.createSession();
 
-        devTools.send(Network.emulateNetworkConditions(false, 0, 2 * 1024 * 1024, 2 * 1024 * 1024, Optional.empty()));
+        devTools.send(Network.emulateNetworkConditions(false, 0, 2 * 1024 * 1024, 2 * 1024 * 1024, empty(), empty(), empty(), empty()));
         driver.get("https://fast.com");
         Thread.sleep(15000);
         String speed = driver.findElement(By.id("speed-value")).getText();
@@ -64,7 +66,7 @@ public class EmulateNetworkConditions {
 
     }
 
-    
+
     public void tearDown() {
         try {
             driver.quit();

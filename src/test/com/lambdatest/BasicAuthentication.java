@@ -3,6 +3,7 @@ package com.lambdatest;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.HasAuthentication;
@@ -23,15 +24,15 @@ public class BasicAuthentication {
 
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability("browserName", "Chrome");
-        capabilities.setCapability("browserVersion", "95");
-        HashMap<String, Object> ltOptions = new HashMap<String, Object>();
+        capabilities.setCapability("browserVersion", "127");
+        Map<String, Object> ltOptions = new HashMap<>();
         ltOptions.put("user", System.getenv("LT_USERNAME"));
         ltOptions.put("accessKey", System.getenv("LT_ACCESS_KEY"));
         ltOptions.put("build", "Selenium 4");
         ltOptions.put("name", this.getClass().getName());
         ltOptions.put("platformName", "Windows 10");
         ltOptions.put("seCdp", true);
-        ltOptions.put("selenium_version", "4.0.0");
+        ltOptions.put("selenium_version", "4.23.0");
         capabilities.setCapability("LT:Options", ltOptions);
 
         driver = new RemoteWebDriver(new URL(hubURL), capabilities);
