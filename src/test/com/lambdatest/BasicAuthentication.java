@@ -22,18 +22,24 @@ public class BasicAuthentication {
 
     public void setup() throws MalformedURLException {
 
-        DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities.setCapability("browserName", "Chrome");
-        capabilities.setCapability("browserVersion", "127");
-        Map<String, Object> ltOptions = new HashMap<>();
-        ltOptions.put("user", System.getenv("LT_USERNAME"));
-        ltOptions.put("accessKey", System.getenv("LT_ACCESS_KEY"));
-        ltOptions.put("build", "Selenium 4");
-        ltOptions.put("name", this.getClass().getName());
-        ltOptions.put("platformName", "Windows 10");
-        ltOptions.put("seCdp", true);
-        ltOptions.put("selenium_version", "4.23.0");
-        capabilities.setCapability("LT:Options", ltOptions);
+        ChromeOptions browserOptions = new ChromeOptions();
+browserOptions.setPlatformName("Windows 11");
+browserOptions.setBrowserVersion("131");
+HashMap<String, Object> ltOptions = new HashMap<String, Object>();
+ltOptions.put("username", "sawantraj591");
+ltOptions.put("accessKey", "gYDaQexsK3JYZ1I5WCPoeF29pJDnjjAQZdUe0F43UXZuqygdlG");
+ltOptions.put("geoLocation", "IN");
+ltOptions.put("visual", true);
+ltOptions.put("timezone", "Kolkata");
+ltOptions.put("build", "demo");
+ltOptions.put("project", "sampleProject");
+ltOptions.put("smartUI.project", "DemiCertificate");
+ltOptions.put("name", "demoLambdaTest");
+ltOptions.put("console", "true");
+ltOptions.put("networkThrottling", "Offline");
+ltOptions.put("selenium_version", "4.0.0");
+ltOptions.put("w3c", true);
+browserOptions.setCapability("LT:Options", ltOptions);
 
         driver = new RemoteWebDriver(new URL(hubURL), capabilities);
         System.out.println(driver);
