@@ -20,15 +20,11 @@ public class SmartUI {
 
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability("browserName", "Chrome");
-        capabilities.setCapability("browserVersion", "127");
         Map<String, Object> ltOptions = new HashMap<>();
         ltOptions.put("user", System.getenv("LT_USERNAME"));
         ltOptions.put("accessKey", System.getenv("LT_ACCESS_KEY"));
         ltOptions.put("build", "SmartUI-Java-Sample");
         ltOptions.put("name", this.getClass().getName());
-        ltOptions.put("platformName", "Windows 10");
-        ltOptions.put("seCdp", true);
-        ltOptions.put("selenium_version", "4.23.0");
         ltOptions.put("smartUI.project","Java-Selenium");
         capabilities.setCapability("LT:Options", ltOptions);
 
