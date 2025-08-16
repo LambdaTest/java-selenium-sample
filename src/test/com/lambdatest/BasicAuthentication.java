@@ -15,6 +15,14 @@ import org.openqa.selenium.devtools.HasDevTools;
 import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 public class BasicAuthentication {
     public static String hubURL = "https://hub.lambdatest.com/wd/hub";
@@ -83,10 +91,58 @@ public class BasicAuthentication {
         System.out.println(reason);
     }
 
+    public class SimpleFormDemoTest {
+    WebDriver driver;
+
+    @BeforeClass
+    public void setUp() {
+        // Set up ChromeDriver path if not in system PATH
+        // System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");
+
+        driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get("https://www.lambdatest.com/selenium-playground");
+    }
+
+    @Test
+    public void testSimpleFormDemo() {
+        // 2. Click "Simple Form Demo"
+        driver.findElement(By.linkText("Simple Form Demo")).click();
+
+        // 3. Validate that the URL contains "simple-form-demo"
+        String currentUrl = driver.getCurrentUrl();
+        Assert.assertTrue(currentUrl.contains("simple-form-demo"), 
+                "URL does not contain 'simple-form-demo'");
+
+        // 4. Create a variable for the string
+        String message = "Welcome to Lambda Test";
+
+        // 5. Enter the value in "Enter Message" text box
+        WebElement messageBox = driver.findElement(By.id("user-message"));
+        messageBox.clear();
+        messageBox.sendKeys(message);
+
+        // 6. Click "Get Checked Value"
+        driver.findElement(By.id("showInput")).click();
+
+        // 7. Validate the same text is displayed
+        String displayedMessage = driver.findElement(By.id("message")).getText();
+        Assert.assertEquals(displayedMessage, message, 
+                "Displayed message does not match input message");
+    }
+
+    @AfterClass
+    public void tearDown() {
+        if (driver != null) {
+            driver.quit();
+        }
+    }
+}
     public static void main(String[] args) throws MalformedURLException, InterruptedException {
         BasicAuthentication test = new BasicAuthentication();
         test.setup();
         test.authentication();
         test.tearDown();
+        
     }
 }
