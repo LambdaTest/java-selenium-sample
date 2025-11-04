@@ -12,7 +12,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.HasDevTools;
-import org.openqa.selenium.devtools.v127.emulation.Emulation;
+import org.openqa.selenium.devtools.v140.emulation.Emulation;
 import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -60,9 +60,16 @@ public class EmulateGeolocation {
 
         // setGeolocationOverride() takes input lattitude, longitude and accuracy as
         // parameters.
-        devTools.send(Emulation.setGeolocationOverride(Optional.of(28.622409),
-                Optional.of(77.364925),
-                Optional.of(1)));
+        devTools.send(Emulation.setGeolocationOverride(
+                Optional.of(28.622409),   // latitude
+                Optional.of(77.364925),   // longitude
+                Optional.of(1.0),         // accuracy
+                Optional.empty(),         // altitude
+                Optional.empty(),         // altitudeAccuracy
+                Optional.empty(),         // heading
+                Optional.empty()          // speed
+        ));
+
         driver.get("https://my-location.org");
 
         String address = driver.findElement(By.id("address")).getText();
