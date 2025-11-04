@@ -32,7 +32,7 @@ public class BasicAuthentication {
         ltOptions.put("name", this.getClass().getName());
         ltOptions.put("platformName", "Windows 10");
         ltOptions.put("seCdp", true);
-        ltOptions.put("selenium_version", "4.23.0");
+        ltOptions.put("selenium_version", "latest");
         capabilities.setCapability("LT:Options", ltOptions);
 
         driver = new RemoteWebDriver(new URL(hubURL), capabilities);
