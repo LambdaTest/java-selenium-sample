@@ -26,6 +26,9 @@ public class SmartUI {
         ltOptions.put("build", "SmartUI-Java-Sample");
         ltOptions.put("name", this.getClass().getName());
         ltOptions.put("smartUI.project","Java-Selenium");
+        if(System.getenv("BUILD_NAME")!=null && System.getenv("BUILD_NAME")!=""){
+            ltOptions.put("smartUI.build",System.getenv("BUILD_NAME"));
+        }
         capabilities.setCapability("LT:Options", ltOptions);
 
         driver = new RemoteWebDriver(new URL(hubURL), capabilities);
